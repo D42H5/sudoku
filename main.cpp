@@ -1,12 +1,12 @@
+#include "InputFunctions.h"
+#include "ValidatingFunctions.h"
+#include "SolvingFunctions.h"
 #include <iostream>
 #ifdef _WIN32
 #include <Windows.h>
 #else
 #include <unistd.h>
 #endif
-#include "ValidatingFunctions.h"
-#include "SolvingFunctions.h"
-#include "InputFunctions.h"
 using namespace std;
 
 int main()
@@ -19,8 +19,8 @@ int main()
     // and each number must have a space after it (except the ninth which
     // should have a return)
     inputSquare(grid);
-    if (checkBox(grid, 1, 0, 0))
-        cout << "Works" << endl;
+    if (checkRowWithNum(grid, 2, 0, 0))
+        {std::cout << "Bruhhh" << std::endl; }
     /*
     // Logic for funsies
     while (!validSudoku(grid))

@@ -1,3 +1,4 @@
+#include "ValidatingFunctions.h"
 #include "SolvingFunctions.h"
 
 // Function to see if a 3x3 box doesn't have num
@@ -19,7 +20,7 @@ bool checkBox(std::vector<std::vector<int>> &grid, int num, int rowStart, int co
     // Return true if no instance of num is found (good to continue with trying to find a solution)
     return (count == 0) ? true : false;
 }
-/*
+
 // Changes coords vector to have row and col in a box that would be the solution for num
 void findSpots(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>> &coords, int num, int rowStart, int colStart)
 {
@@ -53,4 +54,14 @@ void findSpots(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>
     
     // At this point, coords is either empty because more than 1 solution or 0 solutions
     // Or it has exactly 1 solution, thus being the spot to put down num
-} */
+} 
+
+// Function to return previous multiple of num 
+// In this program, multipleOf should be 3 to find what 3x3 box in matrix the main currently resides in
+int findPrevMultiple(int num, int multipleOf)
+{
+    while(num % multipleOf != 0)
+        { num--; }
+    
+    return num;
+}

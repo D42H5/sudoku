@@ -4,5 +4,6 @@
 
 bool checkBox(std::vector<std::vector<int>> &, int, int, int);
 void findSpots(std::vector<std::vector<int>> &, std::vector<std::vector<int>> &, int, int, int);
+int findPrevMultiple(int, int);
 
 #endif
