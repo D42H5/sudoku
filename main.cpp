@@ -4,7 +4,8 @@
 #else
 #include <unistd.h>
 #endif
-#include "validatingFunctions.h"
+#include "ValidatingFunctions.h"
+#include "SolvingFunctions.h"
 #include "InputFunctions.h"
 using namespace std;
 
