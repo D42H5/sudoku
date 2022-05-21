@@ -1,6 +1,5 @@
 #include "Functions.h"
 
-
 // Returns true if row passed has number appear exactly n times
 // NOTE:: n should either be 1 or 0 for purposes of validity checking (1) or 
 // finding solutions (0)
