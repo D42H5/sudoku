@@ -55,13 +55,3 @@ void findSpots(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>
     // At this point, coords is either empty because more than 1 solution or 0 solutions
     // Or it has exactly 1 solution, thus being the spot to put down num
 } 
-
-// Function to return previous multiple of num 
-// In this program, multipleOf should be 3 to find what 3x3 box in matrix the main currently resides in
-int findPrevMultiple(int num, int multipleOf)
-{
-    while(num % multipleOf != 0)
-        { num--; }
-    
-    return num;
-}

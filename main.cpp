@@ -17,22 +17,21 @@ int main()
     // Inserting predefined sudoku grid in grid vector
     // NOTE: any blank spaces in grid must be filled with zeroes
     // and each number must have a space after it (except the ninth which
-    // should have a return)
+    // should have a line feed)
     inputSquare(grid);
-    if (checkRowWithNum(grid, 2, 0, 0))
-        {std::cout << "Bruhhh" << std::endl; }
-    /*
+
     // Logic for funsies
     while (!validSudoku(grid))
     {
-        // Try to find additional solutions
+        // Try to find solutions for each number
         for (int num = 1; num <= 9; num++)
         {
+            // Loop through each 3x3 box in sudoku grid
 
         }
         // printGrid(grid);
         sleep(1);
-    }*/
+    }
     
     return 0;
 }
