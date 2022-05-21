@@ -1,4 +1,3 @@
-#include "ValidatingFunctions.h"
 #include "SolvingFunctions.h"
 
 // Function to see if a 3x3 box doesn't have num
@@ -27,7 +26,7 @@ void findSpots(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>
     // Keep track of number of possible spots in a box
     int count {0};
 
-    // Clearing coords for new coordinates
+    // Clearing coords vector for new coordinates
     coords.clear();
 
     // Looping through 3x3 box and counting number of possible spots
