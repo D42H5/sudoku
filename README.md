@@ -16,3 +16,20 @@ Example sudokuGrid.txt:
 
 Go ahead and copy and paste this example into sudokuGrid.txt to give this program a try!
 Have fun solving sudoku puzzles now :)
+
+To run the program -
+
+Linux / Mac:
+    - Make a folder and add all the contents to it
+    - Add your puzzle in sudokuGrid.txt
+    - Navigate to the directory in your terminal
+    - type ./main.out and hit return
+    - enjoy :)
+
+Windows:
+    - Make a folder and add all the contents to it
+    - Add your puzzle in sudokuGrid.txt
+    - Rename main.out to main.exe
+    - Navigate to the directory in powershell or cmd
+    - type ./main.exe and hit return
+    - enjoy :)
