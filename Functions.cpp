@@ -1,4 +1,5 @@
 #include "Functions.h"
+#include <iostream>
 
 // Returns true if row passed has number appear exactly n times
 // NOTE:: n should either be 1 or 0 for purposes of validity checking (1) or 
@@ -96,7 +97,6 @@ bool validSudoku(std::vector<std::vector<int>> &grid)
 }
 
 
-
 // Functions for solving stuffs
 
 // Function to see if a 3x3 box doesn't have num
@@ -153,4 +153,54 @@ void findSpots(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>
     // At this point, coords is either empty because more than 1 solution or 0 solutions
     // Or it has exactly 1 solution, thus being the spot to put down num
 } 
+
+// Function to find all empty spots in a box, store possible solutions in new vector,
+// and change empty spot to certain num if that num is the only solution in that spot
+void appliedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, int rowStart, int colStart)
+{
+    // Make vector to hold numbers at each empty spot
+    std::vector<std::vector<int>> spots;
+    
+    // Use count to keep track of what space is currently being checked
+    int count {0};
+
+    // Loop through box and at each empty spot, find all nums that fit
+    for (int row = rowStart; row < rowStart + 3; row++)
+    {
+        for (int col = colStart; col < colStart + 3; col++)
+        {
+            // If not 0 (empty), continue to next spot
+            if (grid[row][col] != 0)
+                { continue; }
+            
+            // Else add coords and find all possible solutions for that spot
+            else
+            {
+                // Adding coords to 
+                spots.push_back( {row, col} );
+
+                // Looping through numbers in nums vector
+                for (int num : nums)
+                {
+                    // If num is a solution at current space, add it to current 
+                    // space vector in the spots vector
+                    if (checkRowWithNum(grid, num, row, 0) && checkColWithNum(grid, num, col, 0))
+                        { spots[count].push_back(num); }
+                }
+
+                // Up count for tracking the next empty space
+                ++count;
+            }
+        }
+    }
+    // Check if one of the empty spots only has 1 number that works
+    // i.e., empty space vector has size of 3 (2 for coords and 1 for solution)
+    for (auto &vec : spots)
+    {
+        // Change that spot to that number if so
+        if (vec.size() == 3)
+            { grid[ vec[0] ][ vec[1] ] = vec[2]; }
+    }
+    // End function
+}
 
