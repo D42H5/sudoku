@@ -11,6 +11,6 @@ bool validSudoku(std::vector<std::vector<int>> &);
 // Solving stuffs
 bool checkBox(std::vector<std::vector<int>> &, int, int, int);
 void findSpots(std::vector<std::vector<int>> &, std::vector<std::vector<int>> &, int, int, int);
-void appliedLogic(std::vector<std::vector<int>> &, std::vector<int> &, int, int);
+bool appliedLogic(std::vector<std::vector<int>> &, std::vector<int> &, int, int);
 
 #endif

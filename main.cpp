@@ -26,13 +26,17 @@ int main()
     // Using a bool to control whether or not logic is applied to find new solutions
     bool madeChange {false};
 
+
     // Inserting predefined sudoku grid in grid vector
     // NOTE: any blank spaces in grid must be filled with zeroes
     // and each number must have a space after it (except the ninth which
     // should have a line feed)
     inputSquare(grid);
 
-    // Big brain solving
+    // FIXME : Remove later... need for printing atm
+    // int box {0};
+
+    // Logic for funsies
     do
     {
         // Clearing any numbers from the toRemove vector
@@ -44,17 +48,30 @@ int main()
         // Try to find solutions for each number
         for (int num : toCheck)
         {   
+            // FIXME : remove later
+            // box = 0;
+            // cout << num << endl;
+
+
             // Loop through each 3x3 box in sudoku grid
             for (int rowStart = 0; rowStart < 9; rowStart += 3)
             {
                 for (int colStart = 0; colStart < 9; colStart += 3)
                 {
+                    // FIXME : remove later 
+                    // ++box;
+
+
                     // Making vector to store coordinates of solutions
                     vector<vector<int>> coords;
 
                     // Check current box and see if num is not in it
                     if (checkBox(grid, num, rowStart, colStart))
                     {
+                        // FIXME : remove later
+                        // cout << "I'm checking box " << box << endl;
+
+
                         // If num is not in current box, look for solutions
                         findSpots(grid, coords, num, rowStart, colStart);
 
@@ -66,6 +83,9 @@ int main()
                         // Else solution found! So update sudoku grid
                         else
                             {
+                                // FIXME : remove later
+                                // cout << "Changing grid[" << coords[0][0] << "][" << coords[0][1] << "] to " << num << endl;
+
                                 grid[ coords[0][0] ][ coords[0][1] ] = num; 
                                 madeChange = true;
                             }
@@ -76,6 +96,9 @@ int main()
                         { continue; }
                 }
             }
+            // FIXME : remove later
+            // cout << endl;
+
 
             // After looping through entire sudoku grid, check to see if current num is completely finished
             // If num is finished, add it to the toRemove vector
@@ -86,13 +109,17 @@ int main()
         // If no changes have been made, use some additional logic
         if (!madeChange)
         {
+            // FIXME : remove cout later
+            // cout << "Applying logic\n";
+
             // Loop through each 3x3 box in sudoku grid
             for (int rowStart = 0; rowStart < 9; rowStart += 3)
             {
                 for (int colStart = 0; colStart < 9; colStart += 3)
                 {
                     // Apply logic lol
-                    appliedLogic(grid, toCheck, rowStart, colStart);
+                    if (appliedLogic(grid, toCheck, rowStart, colStart))
+                        { madeChange = true; }
                 }
             }
         }
@@ -101,10 +128,28 @@ int main()
         for (int temp : toRemove)
             { toCheck.erase( find(toCheck.begin(), toCheck.end(), temp) ); }
 
-    } while (!validSudoku(grid));
+        // FIXME : remove later, need for printing atm
+        // cout << "Next Sudoku Grid:" << endl;
+        // printGrid(grid); 
+        // cout << endl << endl; 
+        // sleep(2);
+
+    // Repeat while changes are being made and sudoku grid isn't solved yet
+    } while (!validSudoku(grid) && madeChange);
     
-    cout << "Solution:" << endl;
-    printGrid(grid);
+    // If exited because no changes were made,
+    // Announce that my brain is not big enough to code this yet :/
+    if (!madeChange)
+    {   cout << "Sorry, this puzzle is too big brain for this code right now...";
+        cout << "try coming back later to see if this code can solve it then!" << endl; }
+    
+    // Else sudoku was able to be solved!
+    else
+    {
+        cout << "Solution:" << endl;
+        printGrid(grid);
+    }
+
     return 0;
 }
 

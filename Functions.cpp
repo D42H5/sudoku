@@ -97,6 +97,7 @@ bool validSudoku(std::vector<std::vector<int>> &grid)
 }
 
 
+
 // Functions for solving stuffs
 
 // Function to see if a 3x3 box doesn't have num
@@ -156,10 +157,13 @@ void findSpots(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>
 
 // Function to find all empty spots in a box, store possible solutions in new vector,
 // and change empty spot to certain num if that num is the only solution in that spot
-void appliedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, int rowStart, int colStart)
+bool appliedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, int rowStart, int colStart)
 {
     // Make vector to hold numbers at each empty spot
     std::vector<std::vector<int>> spots;
+
+    // Boolean to see if a change is made
+    bool madeChange {false};
     
     // Use count to keep track of what space is currently being checked
     int count {0};
@@ -199,8 +203,14 @@ void appliedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, i
     {
         // Change that spot to that number if so
         if (vec.size() == 3)
-            { grid[ vec[0] ][ vec[1] ] = vec[2]; }
+            {   
+                // std::cout << "Changing grid[" << vec[0] << "][" << vec[1] << "] to " << vec[2] << std::endl;
+                grid[ vec[0] ][ vec[1] ] = vec[2]; 
+                madeChange = true;
+            }
     }
-    // End function
+    
+    // Return madeChange for checking purposes in main
+    return madeChange;
 }
 
