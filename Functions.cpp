@@ -222,165 +222,42 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     // Vector to hold possible solutions in passed spot
     std::vector<int> spot;
 
-    // Make vectors to hold numbers in empty cells in same row and column
-    std::vector<std::vector<int>> sameRow;
-    std::vector<std::vector<int>> sameCol;
+    // Make vectors to hold solutions for empty cells in same row and column
+    std::vector<std::vector<int>> sameRow = rowHypos(grid, nums, row, col);
+    std::vector<std::vector<int>> sameCol = colHypos(grid, nums, row, col);
 
     // Boolean to see if a change is made
-    bool madeChange {false};
+    bool madeChange {false},
+
+    // used to keep track of whether or not a solution in spot vector is nowhere else in row or col hypotheticals
+        alone {true};
+
+    // FIXME : DELTE LATER
+    std::cout << "Before finding solutions for spot\n";
+    // Get possible solutions for current coords
+    for (int num : nums)
+    {
+        if (checkBox(grid, num, findPrevThree(row), findPrevThree(col)) && checkRowWithNum(grid, num, row, 0) && checkColWithNum(grid, num, col, 0))
+        {
+            spot.push_back( {num} );
+        }
+    }
     
-    // Use count to keep track of what space is currently being checked
-    // Use appear to keep track of number of times number has appeared
-    int count {0},
-        appear {0};
+    // FIXME : DELTE LATER
+    std::cout << "Before checking hypotheticals\n";
 
-    // Use boxRow and boxCol to look through right set of boxes
-    int boxRow,
-        boxCol;
-
-    // Set right boxes to be checked
-    boxRow = (row > 2) ? ( (row > 5) ? 6 : 3) : 0; 
-    boxCol = (col > 2) ? ( (col > 5) ? 6 : 3) : 0;
-
-    // Loop through column and find solutions in empty spaces
-    for (int checkR = 0; checkR < 9; checkR++)
-    {
-        // IF COORDS MATCH PASSED ROW, ADD TO SEPARATE VECTOR FOR EASE OF USE LATER
-        if (checkR == row)
-        {
-            // Find solutions for actual spot
-            for (int num : nums)
-            {
-                // Find solutions in empty cell
-                if (checkBox(grid, num, findPrevThree(checkR), boxCol) && checkRowWithNum(grid, num, row, 0) && checkColWithNum(grid, num, col, 0))
-                    { spot.push_back(num); }
-            }
-        }
-        // If current cell is empty, do stuff
-        else if (grid[checkR][col] == 0)
-        {
-            // Loop through numbers in nums
-            for (int num : nums)
-            {
-                int temp {0};
-                // Find solutions in empty cell
-                if (checkBox(grid, num, findPrevThree(checkR), boxCol) && checkRowWithNum(grid, num, checkR, 0) && checkColWithNum(grid, num, col, 0))
-                { 
-                    if (temp++ == 0)
-                        { sameCol.push_back( {num} ); }
-                    else
-                        { sameCol[count].push_back( {num} ); }
-            }
-            // Update count to be able to add to next coord
-            count++;
-            }
-        }
-    }
-
-    // After making vectors of all solutions, remove a num if it appears more than twice
-    // Check all numbers in nums
-    for (int num : nums)
-    {
-        // Reset appear for new numbers
-        appear = 0;
-
-        // Loop through sameCol
-        for (auto &vec : sameCol)
-        {
-            // Start looking after coords
-            for (int temp : vec)
-            {
-                if (temp == num)
-                    { appear++; }
-            }
-        }
-
-        // Remove from all vectors if a num appears more than twice
-        if (appear > 2)
-        {
-            for (auto &vec : sameCol)
-            {
-                std::cout << "Erasing something in sameCol\n";
-                std::vector<int>::iterator iter = vec.begin();
-
-                // Find and erase each instance of num from vectors in sameCol
-                iter = std::find(iter, vec.end(), num);
-                if (iter != vec.end())
-                    { vec.erase(iter); }
-            }
-        }
-    }
-
-    // Loop through row and find solutions in empty spaces
-    for (int checkC = 0; checkC < 9; checkC++)
-    {
-        // IF CHECKC MATCHES PASSED COL JUST SKIP
-        if (checkC == col)
-            { continue; }
-
-        // If current cell is empty, do stuff
-        else if (grid[row][checkC] == 0)
-        {
-            // Loop through numbers in nums
-            for (int num : nums)
-            {
-                int temp {0};
-                // Find solutions in empty cell
-                if (checkBox(grid, num, boxRow, findPrevThree(checkC)) && checkRowWithNum(grid, num, row, 0) && checkColWithNum(grid, num, checkC, 0))
-                { 
-                    if (temp++ == 0)
-                        { sameRow.push_back( {num} ); }
-                    else
-                        { sameRow[count].push_back( {num} ); } 
-                }
-            }
-            // Update count to be able to add to next coord
-            count++;
-        }
-    }
-
-    // After making vectors of all solutions, remove a num if it appears more than twice
-    // Check all numbers in nums
-    for (int num : nums)
-    {
-        // Reset appear for new numbers
-        appear = 0;
-
-        // Loop through sameCol
-        for (auto &vec : sameRow)
-        {
-            // Start looking after coords
-            for (int temp : vec)
-            {
-                if (temp == num)
-                    { appear++; }
-            }
-        }
-
-        // Remove from all vectors if a num appears more than twice
-        if (appear > 2)
-        {
-            for (auto &vec : sameRow)
-            {
-                std::cout << "Erasing something in sameRow\n";
-                std::vector<int>::iterator iter = vec.begin();
-
-                // Find and erase each instance of num from vectors in sameCol
-                iter = std::find(iter, vec.end(), num);
-                if (iter != vec.end())
-                    { vec.erase(iter); }
-            }
-        }
-    }
-
-    // Now with all of this knowledge, let us commence the biggest of braining today
-    bool alone {true};
     // For each num at coords, check if num is in hypothetical sameRow and sameCol
     for (int num : spot)
     {
+        // Reset alone boolean for each number
+        alone = true;
+
         // Loop through all hypotheticals in sameRow
         for (auto &vec : sameRow)
         {
+            // FIXME : DELTE LATER
+            std::cout << "Checking vec in sameRow\n";
+
             // If more than 2 hypotheticals skip
             if (vec.size() > 2)
                 { continue; }
@@ -396,6 +273,9 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
         // Looping through all hypotheticals in sameCol
         for (auto &vec : sameCol)
         {
+            // FIXME : DELTE LATER
+            std::cout << "Checking vec in sameCol\n";
+
             // If more than 2 hypotheticals skip
             if (vec.size() > 2)
                 { continue; }
@@ -414,10 +294,158 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
             std::cout << "Changing grid[" << row << "][" << col << "] to " << num << std::endl;
             grid[row][col] = num;
             madeChange = true;
+            break;
         }
     }
 
     return madeChange;
+}
+
+std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std::vector<int> &nums, int row, int col)
+{
+    // 2D Vector to return with all the values
+    std::vector<std::vector<int>> values;
+
+    // count for adding values to the right place in rowValues 
+    int count {0},
+    // appear for helping with removal of excess values
+        appear {0},
+    // first for use in either making new row in rowValues or adding solution to existing row
+        first {0};
+
+    // Loop through column and find solutions in empty spaces
+    for (int num : nums)
+    {
+        // Resetting for new numbers
+        appear = 0;
+        count = 0;
+
+        // Loop through each cell in column
+        for (int check = 0; check < 9; check++)
+        {
+            // FIXME : DELTE LATER
+            std::cout << "Checking row: " << check << " | num: " << num << std::endl;
+
+            // If num in row already, break out of loop row checking loop
+            if (checkRowWithNum(grid, num, row, 1))
+            { 
+                std::cout << "Num already in row... skipping\n";
+                break; 
+            }
+
+            // IF COORDS MATCH PASSED ROW, CONTINUE AND DEAL WITH IT LATER
+            else if (check == col)
+                { continue; }
+
+            // If space is empty, see if num is a solution
+            else if (grid[row][check] == 0)
+            {
+                // FIXME : DELTE LATER
+                std::cout << "Empty box... checking if solution\n";
+
+                if (checkBox(grid, num, findPrevThree(row), findPrevThree(check)) && checkColWithNum(grid, num, check, 0))
+                {
+                    // FIXME : DELTE LATER
+                    std::cout << "Before adding\n";
+
+                    // (first == 0) ? values.push_back( {num} ) : values[count++].push_back( {num} );
+                    if (first == 0)
+                        { values.push_back( {num} ); }
+                    // else
+                    //     { values[count++].push_back( {num} ); }
+                    appear++;
+
+                    // FIXME : DELTE LATER
+                    std::cout << "Post adding to vec\n";
+                }
+            }
+        }
+
+        // Removing num from rowValues if appears more than twice
+        if (appear > 2)
+        {
+            // FIXME : DELTE LATER
+            std::cout << "A WILD NUM APPEARED MORE THAN 2X\n";
+            for (auto &vec : values)
+            {
+                // FIXME : DELTE LATER
+                std::cout << "Before erasing\n";
+
+                // Find and erase each instance of num from vectors in sameCol
+                std::vector<int>::iterator iter { std::find(vec.begin(), vec.end(), num) };
+                if (iter != vec.end())
+                    { vec.erase(iter); }
+
+                // FIXME : DELTE LATER
+                std::cout << "After erasing\n";
+            }
+        }
+        // If num appears less than twice, increase first to prevent seg faults when using .push_back :)
+        else
+            { first++; }
+    }
+
+    // FIXME : DELTE LATER
+    std::cout << "Returning to sender...\n";
+
+    return values;
+}
+
+std::vector<std::vector<int>> colHypos(std::vector<std::vector<int>> &grid, std::vector<int> &nums, int row, int col)
+{
+    // 2D Vector to return with all the values
+    std::vector<std::vector<int>> values;
+
+    // count for adding values to the right place in rowValues 
+    int count {0},
+    // appear for helping with removal of excess values
+        appear {0},
+    // first for use in either making new row in rowValues or adding solution to existing row
+        first {0};
+
+    // Loop through column and find solutions in empty spaces
+    for (int num : nums)
+    {
+        // Resetting for new numbers
+        appear = 0;
+        count = 0;
+
+        // Loop through each cell in column
+        for (int check = 0; check < 9; check++)
+        {
+            // IF COORDS MATCH PASSED ROW, CONTINUE AND DEAL WITH IT LATER
+            if (check == row)
+                { continue; }
+
+            // If space is empty, see if num is a solution
+            else if (grid[check][col] == 0)
+            {
+                if (checkBox(grid, num, findPrevThree(check), findPrevThree(col)) && checkRowWithNum(grid, num, check, 0) && checkColWithNum(grid, num, col, 0))
+                {
+                    (first++ == 0) ? values.push_back( {num} ) : values[count++].push_back( {num} );
+                    appear++;
+                }
+            }
+        }
+
+        // Removing num from rowValues if appears more than twice
+        if (appear > 2)
+        {
+            for (auto &vec : values)
+            {
+                // Find and erase each instance of num from vectors in sameCol
+                std::vector<int>::iterator iter { std::find(vec.begin(), vec.end(), num) };
+                if (iter != vec.end())
+                    { vec.erase(iter); }
+            }
+
+            // Reset first to 0 if the very first num in nums
+            if (first == 1)
+                { first = 0; }
+        }
+    }
+
+    return values;
 }
 
 int findPrevThree(int num)
