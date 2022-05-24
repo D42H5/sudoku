@@ -106,7 +106,7 @@ int main()
                 { toRemove.push_back(num); }
         } 
 
-        // If no changes have been made, use some additional logic
+        // // If no changes have been made, use some additional logic
         if (!madeChange)
         {
             // FIXME : remove cout later
@@ -124,15 +124,37 @@ int main()
             }
         }
 
+        // If no changes still, use ADVANCED SCIENCE AND TECHNOLOGY
+        if (!madeChange)
+        {
+            // FIXME : remove cout later
+            cout << "Applying MATH AND SCIENCE\n";
+
+            // Loop through every possible cell in the damn grid
+            for (int row = 0; row < 9; row++)
+            {
+                for (int col = 0; col < 9; col++)
+                {
+                    // BEHOLD
+                    // Making sure to only pass in empty cells
+                    if (grid[row][col] == 0)
+                    {
+                        if( advancedLogic(grid, toCheck, row, col) )
+                            { madeChange = true;}
+                    }
+                }
+            }
+        }
+
         // Remove any numbers from toCheck that are in the toRemove vector
         for (int temp : toRemove)
             { toCheck.erase( find(toCheck.begin(), toCheck.end(), temp) ); }
 
         // FIXME : remove later, need for printing atm
-        // cout << "Next Sudoku Grid:" << endl;
-        // printGrid(grid); 
-        // cout << endl << endl; 
-        // sleep(2);
+        cout << "Next Sudoku Grid:" << endl;
+        printGrid(grid); 
+        cout << endl << endl; 
+        sleep(1);
 
     // Repeat while changes are being made and sudoku grid isn't solved yet
     } while (!validSudoku(grid) && madeChange);
