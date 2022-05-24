@@ -11,11 +11,17 @@
 using namespace std;
 
 void printGrid(vector<vector<int>> &grid);
+void hypoPrint(vector<vector<vector<int>>> &hypos);
 
 int main()
 {
     // Declaring and filling a 9x9 grid with zeroes
     vector<vector<int>> grid {9, vector<int>(9)};
+
+    // Declaring 3D vector to hold all hypotheticals because brain no think of pattern yet
+    // So I waste time with something that is simpler in idea but probably significantly
+    // More difficult to handle in practice :)
+    vector<vector<vector<int>>> hypos {9, vector<vector<int>> (9, vector<int> (1) ) };
 
     // Declaring a vector to keep track of the numbers that aren't finished
     vector<int> toCheck {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -32,6 +38,8 @@ int main()
     // and each number must have a space after it (except the ninth which
     // should have a line feed)
     inputSquare(grid);
+    updateHypos(grid, hypos, toCheck);
+    hypoPrint(hypos);
 
     // FIXME : Remove later... need for printing atm
     // int box {0};
@@ -98,12 +106,6 @@ int main()
             }
             // FIXME : remove later
             // cout << endl;
-
-
-            // After looping through entire sudoku grid, check to see if current num is completely finished
-            // If num is finished, add it to the toRemove vector
-            if (checkAllCols(grid, num, 0) && checkAllRows(grid, num, 0))
-                { toRemove.push_back(num); }
         } 
 
         // // If no changes have been made, use some additional logic
@@ -124,30 +126,41 @@ int main()
             }
         }
 
-        // If no changes still, use ADVANCED SCIENCE AND TECHNOLOGY
-        if (!madeChange)
-        {
-            // FIXME : remove cout later
-            cout << endl << endl << "Applying ADVANCED MATH AND SCIENCE\n";
 
-            // Loop through every possible cell in the damn grid
-            for (int row = 0; row < 9 && !madeChange; row++)
-            {
-                for (int col = 0; col < 9 && !madeChange; col++)
-                {
-                    // BEHOLD
-                    // Making sure to only pass in empty cells
-                    if (grid[row][col] == 0)
-                    {
-                        cout << endl << "Passing grid[" << row << "][" << col << "] to advancedLogic\n";
-                        // If, using super-painfully made logic, a change is made, update madeChange
-                        if( advancedLogic(grid, toCheck, row, col) )
-                            { madeChange = true; }
-                        // char c;
-                        // cin >> c;
-                    }
-                }
-            }
+
+        // // If no changes still, use ADVANCED SCIENCE AND TECHNOLOGY
+
+        // if (!madeChange)
+        // {
+        //     // FIXME : remove cout later
+        //     cout << endl << endl << "Applying ADVANCED MATH AND SCIENCE\n";
+
+        //     // Loop through every possible cell in the damn grid
+        //     for (int row = 0; row < 9 && !madeChange; row++)
+        //     {
+        //         for (int col = 0; col < 9 && !madeChange; col++)
+        //         {
+        //             // BEHOLD
+        //             // Making sure to only pass in empty cells
+        //             if (grid[row][col] == 0)
+        //             {
+        //                 cout << endl << "Passing grid[" << row << "][" << col << "] to advancedLogic\n";
+        //                 // If, using super-painfully made logic, a change is made, update madeChange
+        //                 if( advancedLogic(grid, toCheck, row, col) )
+        //                     { madeChange = true; }
+        //                 // char c;
+        //                 // cin >> c;
+        //             }
+        //         }
+        //     }
+        // }
+
+        for (int num : toCheck)
+        {
+            // After looping through entire sudoku grid, check to see if current num is completely finished
+            // If num is finished, add it to the toRemove vector
+            if (checkAllCols(grid, num, 0) && checkAllRows(grid, num, 0))
+                { toRemove.push_back(num); }
         }
 
         // Remove any numbers from toCheck that are in the toRemove vector
@@ -194,4 +207,22 @@ void printGrid(vector<vector<int>> &grid)
         if (row == 2 || row == 5)
             { cout << "---------------------" << endl;}
     }
+}
+
+// Prints hypotheticals and waits for input for testing
+void hypoPrint(vector<vector<vector<int>>> &hypos)
+{
+    for (auto &square : hypos)
+    {
+        for (auto &vec : square)
+        {
+            for (int num : vec)
+                cout << num << " ";
+            cout << endl;
+        }
+        cout << endl;
+    }
+
+    char c;
+    cin >> c;
 }
