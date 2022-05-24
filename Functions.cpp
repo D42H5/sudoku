@@ -313,12 +313,16 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
     // first for use in either making new row in rowValues or adding solution to existing row
         first {0};
 
+    // Boolean used to make sure first is handled properly
+    bool guide;
+
     // Loop through column and find solutions in empty spaces
     for (int num : nums)
     {
         // Resetting for new numbers
         appear = 0;
         count = 0;
+        guide = true;
 
         // Loop through each cell in column
         for (int check = 0; check < 9; check++)
@@ -330,6 +334,8 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
             if (checkRowWithNum(grid, num, row, 1))
             { 
                 std::cout << "Num already in row... skipping\n";
+                // Updating to handle first properly
+                guide = false;
                 break; 
             }
 
@@ -348,11 +354,7 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
                     // FIXME : DELTE LATER
                     std::cout << "Before adding\n";
 
-                    // (first == 0) ? values.push_back( {num} ) : values[count++].push_back( {num} );
-                    if (first == 0)
-                        { values.push_back( {num} ); }
-                    // else
-                    //     { values[count++].push_back( {num} ); }
+                    (first == 0) ? values.push_back( {num} ) : values[count++].push_back( {num} );
                     appear++;
 
                     // FIXME : DELTE LATER
@@ -381,7 +383,7 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
             }
         }
         // If num appears less than twice, increase first to prevent seg faults when using .push_back :)
-        else
+        else if (guide)
             { first++; }
     }
 
