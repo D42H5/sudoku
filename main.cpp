@@ -120,32 +120,32 @@ int main()
 
 
 
-        // // If no changes still, use ADVANCED SCIENCE AND TECHNOLOGY
+        // If no changes still, use ADVANCED SCIENCE AND TECHNOLOGY
 
-        // if (!madeChange)
-        // {
-        //     // FIXME : remove cout later
-        //     cout << endl << endl << "Applying ADVANCED MATH AND SCIENCE\n";
+        if (!madeChange)
+        {
+            // FIXME : remove cout later
+            cout << endl << endl << "Applying ADVANCED MATH AND SCIENCE\n";
 
-        //     // Loop through every possible cell in the damn grid
-        //     for (int row = 0; row < 9 && !madeChange; row++)
-        //     {
-        //         for (int col = 0; col < 9 && !madeChange; col++)
-        //         {
-        //             // BEHOLD
-        //             // Making sure to only pass in empty cells
-        //             if (grid[row][col] == 0)
-        //             {
-        //                 cout << endl << "Passing grid[" << row << "][" << col << "] to advancedLogic\n";
-        //                 // If, using super-painfully made logic, a change is made, update madeChange
-        //                 if( advancedLogic(grid, toCheck, row, col) )
-        //                     { madeChange = true; }
-        //                 // char c;
-        //                 // cin >> c;
-        //             }
-        //         }
-        //     }
-        // }
+            // Loop through every possible cell in the damn grid
+            for (int row = 0; row < 9 && !madeChange; row++)
+            {
+                for (int col = 0; col < 9 && !madeChange; col++)
+                {
+                    // BEHOLD
+                    // Making sure to only pass in empty cells
+                    if (grid[row][col] == 0)
+                    {
+                        cout << endl << "Passing grid[" << row << "][" << col << "] to advancedLogic\n";
+                        // If, using super-painfully made logic, a change is made, update madeChange
+                        if( advancedLogic(grid, toCheck, row, col) )
+                            { madeChange = true; }
+                        // char c;
+                        // cin >> c;
+                    }
+                }
+            }
+        }
 
         for (int num : toCheck)
         {
