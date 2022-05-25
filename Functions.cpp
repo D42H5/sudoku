@@ -229,9 +229,16 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     // Vector to hold possible solutions in passed spot
     std::vector<int> spot;
 
+    // Vector to hold final "solution" <- in quotes because of case of more than 1 solution (false solutions)
+    std::vector<int> solutions;
+
     // Make vectors to hold solutions for empty cells in same row and column
     std::vector<std::vector<int>> sameRow = rowHypos(grid, nums, row, col);
     std::vector<std::vector<int>> sameCol = colHypos(grid, nums, row, col);
+
+    // Find unique numbers in row and col hypotheticals
+    // std::vector<int> rowUniques = findUnique(rowHypos);
+    // std::vector<int> colUniques = findUnique(colHypos);
 
     // Boolean to see if a change is made
     bool madeChange {false},
@@ -247,6 +254,11 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
             spot.push_back( {num} );
         }
     }
+
+    // FIXME ?
+    // Stop using advancedLogic if there are more than (let's say) 2 possible solutions in a cell
+    if ((int)spot.size() > 2)
+        { return false; }
 
     // For each num at coords, check if num is in hypothetical sameRow and sameCol
     for (int num : spot)
@@ -284,14 +296,17 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
             }
         }
 
-        // If alone is still true, then solution has been found!
+        // If alone is still true, add num to solutions vector
         if (alone)
-        {
-            std::cout << "Changing grid[" << row << "][" << col << "] to " << num << std::endl;
-            grid[row][col] = num;
-            madeChange = true;
-            break;
-        }
+            { solutions.push_back( {num} ); }
+    }
+
+    // If solutions.size() == 1, then only 1 solution so change grid!
+    if ((int)solutions.size() == 1)
+    {
+        std::cout << "Changing grid[" << row << "][" << col << "] to " << solutions.at(0) << std::endl;
+        grid[row][col] = solutions.at(0);
+        madeChange = true;
     }
 
     return madeChange;
@@ -495,4 +510,26 @@ int findPrevThree(int num)
         { --num; }
 
     return num;
+}
+
+// Finds all unique numbers in a 2d vector and returns a 1d vector containing those numbers
+std::vector<int> findUnique(std::vector<std::vector<int>> &orig)
+{
+    std::vector<int> temp;
+
+    // Loop through 2d vector
+    for (auto &vec : orig)
+    {
+        for (int num : vec)
+        {
+            // If num not in temp vector, add it
+            std::vector<int>::iterator iter { std::find(vec.begin(), vec.end(), num) };
+            if (iter != vec.end())
+            {
+                temp.push_back( {num} );
+            }
+        }
+    }
+
+    return temp;
 }

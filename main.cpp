@@ -63,18 +63,16 @@ int main()
                         // So just continue
                         if (coords.empty())
                             { continue; }
-                        
+
                         // Else solution found! So update sudoku grid
                         else
-                            {
-                                grid[ coords[0][0] ][ coords[0][1] ] = num; 
-                                madeChange = true;
-                            }
+                        {
+                            // FIXME : DELETE LATER
+                            cout << "Found solution for " << num << " with regular logic\n";
+                            grid[ coords[0][0] ][ coords[0][1] ] = num; 
+                            madeChange = true;
+                        }
                     }
-
-                    // If num found in current 3x3 box, continue to next box
-                    else
-                        { continue; }
                 }
             }
         } 
@@ -89,7 +87,9 @@ int main()
                 {
                     // Apply logic lol
                     if (appliedLogic(grid, toCheck, rowStart, colStart))
-                        { madeChange = true; }
+                        {   // FIXME: DELETE LATER
+                            cout << "Found solution with applied logic\n";
+                            madeChange = true; }
                 }
             }
         }
@@ -113,9 +113,9 @@ int main()
                         cout << endl << "Passing grid[" << row << "][" << col << "] to advancedLogic\n";
                         // If, using super-painfully made logic, a change is made, update madeChange
                         if( advancedLogic(grid, toCheck, row, col) )
-                            { madeChange = true; }
-                        char c;
-                        cin >> c;
+                            {   // FIXME : DELETE LATER
+                                cout << "Found solution for " << grid[row][col] << " with advanced logic\n";    
+                                madeChange = true; }
                     }
                 }
             }
@@ -137,7 +137,13 @@ int main()
         cout << "Next Sudoku Grid:" << endl;
         printGrid(grid); 
         cout << endl << endl; 
-        sleep(1);
+
+        // FIXME : Pause when grid[row][col] == (some num) find logic flaw
+        if (grid[2][2] == 2)
+        {
+            char c;
+            cin >> c;
+        }
 
     // Repeat while changes are being made and sudoku grid isn't solved yet
     } while (!validSudoku(grid) && madeChange);
