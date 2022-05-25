@@ -33,9 +33,6 @@ int main()
     // should have a line feed)
     inputSquare(grid);
 
-    // FIXME : Remove later... need for printing atm
-    // int box {0};
-
     // Logic for funsies
     do
     {
@@ -48,30 +45,17 @@ int main()
         // Try to find solutions for each number
         for (int num : toCheck)
         {   
-            // FIXME : remove later
-            // box = 0;
-            // cout << num << endl;
-
-
             // Loop through each 3x3 box in sudoku grid
             for (int rowStart = 0; rowStart < 9; rowStart += 3)
             {
                 for (int colStart = 0; colStart < 9; colStart += 3)
                 {
-                    // FIXME : remove later 
-                    // ++box;
-
-
                     // Making vector to store coordinates of solutions
                     vector<vector<int>> coords;
 
                     // Check current box and see if num is not in it
                     if (checkBox(grid, num, rowStart, colStart))
                     {
-                        // FIXME : remove later
-                        // cout << "I'm checking box " << box << endl;
-
-
                         // If num is not in current box, look for solutions
                         findSpots(grid, coords, num, rowStart, colStart, 1);
 
@@ -83,9 +67,6 @@ int main()
                         // Else solution found! So update sudoku grid
                         else
                             {
-                                // FIXME : remove later
-                                // cout << "Changing grid[" << coords[0][0] << "][" << coords[0][1] << "] to " << num << endl;
-
                                 grid[ coords[0][0] ][ coords[0][1] ] = num; 
                                 madeChange = true;
                             }
@@ -96,16 +77,11 @@ int main()
                         { continue; }
                 }
             }
-            // FIXME : remove later
-            // cout << endl;
         } 
 
         // If no changes have been made, use some additional logic
         if (!madeChange)
         {
-            // FIXME : remove cout later
-            // cout << "Applying logic\n";
-
             // Loop through each 3x3 box in sudoku grid
             for (int rowStart = 0; rowStart < 9; rowStart += 3)
             {
@@ -138,8 +114,8 @@ int main()
                         // If, using super-painfully made logic, a change is made, update madeChange
                         if( advancedLogic(grid, toCheck, row, col) )
                             { madeChange = true; }
-                        // char c;
-                        // cin >> c;
+                        char c;
+                        cin >> c;
                     }
                 }
             }
