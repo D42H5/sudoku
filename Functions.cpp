@@ -163,43 +163,6 @@ bool findSpots(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>
 // ------------------------------------------------------------------------
 // Various forms of bullshit COMMENCE
 
-// Copies all non-zero cells from grid to hypos and changes them to -1
-// Simultaneously finds all possible solutions in empty cells
-void updateHypos(std::vector<std::vector<int>> &grid, std::vector<std::vector<std::vector<int>>> &hypos, std::vector<int> &nums)
-{
-    // Loop through grid
-    for (int row = 0; row < 9; row++)
-    {
-        for (int col = 0; col < 9; col++)
-        {
-            // Clear currect vector for new info
-            hypos[row][col].clear();
-
-            // If grid cell is not empty, update hypos correct cell to only have -1
-            if (grid[row][col] != 0)
-                { hypos[row][col].push_back( {-1} ); }
-
-            // Else grid cell is empty, find all the possible solutions
-            else
-            { 
-                for (int num : nums)
-                {
-                    // If solution, add to hypos
-                    if (checkBox(grid, num, findPrevThree(row), findPrevThree(col))
-                                && checkRowWithNum(grid, num, row, 0) && checkColWithNum(grid, num, col, 0))
-                    { 
-                        if (hypos[row][col].at(0) == 0)
-                            { hypos[row][col].at(0) = num; }
-                        else
-                            { hypos[row][col].push_back( {num} ); }
-                    }
-                }   
-            }
-        }
-    }
-}
-
-
 // Function to find all empty spots in a box, store possible solutions in new vector,
 // and change empty spot to certain num if that num is the only solution in that spot
 bool appliedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, int rowStart, int colStart)

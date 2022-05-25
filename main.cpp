@@ -18,11 +18,6 @@ int main()
     // Declaring and filling a 9x9 grid with zeroes
     vector<vector<int>> grid {9, vector<int>(9)};
 
-    // Declaring 3D vector to hold all hypotheticals because brain no think of pattern yet
-    // So I waste time with something that is simpler in idea but probably significantly
-    // More difficult to handle in practice :)
-    vector<vector<vector<int>>> hypos {9, vector<vector<int>> (9, vector<int> (1) ) };
-
     // Declaring a vector to keep track of the numbers that aren't finished
     vector<int> toCheck {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
@@ -38,8 +33,6 @@ int main()
     // and each number must have a space after it (except the ninth which
     // should have a line feed)
     inputSquare(grid);
-    updateHypos(grid, hypos, toCheck);
-    hypoPrint(hypos);
 
     // FIXME : Remove later... need for printing atm
     // int box {0};
@@ -207,22 +200,4 @@ void printGrid(vector<vector<int>> &grid)
         if (row == 2 || row == 5)
             { cout << "---------------------" << endl;}
     }
-}
-
-// Prints hypotheticals and waits for input for testing
-void hypoPrint(vector<vector<vector<int>>> &hypos)
-{
-    for (auto &square : hypos)
-    {
-        for (auto &vec : square)
-        {
-            for (int num : vec)
-                cout << num << " ";
-            cout << endl;
-        }
-        cout << endl;
-    }
-
-    char c;
-    cin >> c;
 }
