@@ -11,7 +11,6 @@
 using namespace std;
 
 void printGrid(vector<vector<int>> &grid);
-void hypoPrint(vector<vector<vector<int>>> &hypos);
 
 int main()
 {
