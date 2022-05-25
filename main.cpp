@@ -100,7 +100,7 @@ int main()
             // cout << endl;
         } 
 
-        // // If no changes have been made, use some additional logic
+        // If no changes have been made, use some additional logic
         if (!madeChange)
         {
             // FIXME : remove cout later
@@ -119,9 +119,7 @@ int main()
         }
 
 
-
         // If no changes still, use ADVANCED SCIENCE AND TECHNOLOGY
-
         if (!madeChange)
         {
             // FIXME : remove cout later
