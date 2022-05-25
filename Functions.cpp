@@ -236,9 +236,8 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     std::vector<std::vector<int>> sameRow = rowHypos(grid, nums, row, col);
     std::vector<std::vector<int>> sameCol = colHypos(grid, nums, row, col);
 
-    // Find unique numbers in row and col hypotheticals
-    // std::vector<int> rowUniques = findUnique(rowHypos);
-    // std::vector<int> colUniques = findUnique(colHypos);
+    // For holding unique numbers from row and col hypotheticals (later)
+    std::vector<int> uniqueNums;
 
     // Boolean to see if a change is made
     bool madeChange {false},
@@ -256,9 +255,11 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     }
 
     // FIXME ?
-    // Stop using advancedLogic if there are more than (let's say) 2 possible solutions in a cell
-    if ((int)spot.size() > 2)
-        { return false; }
+    // Stop using advancedLogic if there are more than (let's say) 3 possible solutions in a cell
+    if ((int)spot.size() > 3)
+        {   // FIXME : DELETE LATER
+            std::cout << "Returning false... too many solutions\n";
+            return false; }
 
     // For each num at coords, check if num is in hypothetical sameRow and sameCol
     for (int num : spot)
@@ -272,6 +273,9 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
             // If more than 2 hypotheticals skip
             if (vec.size() > 2)
                 { continue; }
+
+            // Add all nums in vec that are not in uniqueNums to uniqueNums
+            findUnique(vec, uniqueNums);
 
             // Otherwise consider hypotheticals to be answers and check against them
             for (int temp = 0; temp < (int)vec.size() && alone == true; temp++)
@@ -287,7 +291,10 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
             // If more than 2 hypotheticals skip
             if (vec.size() > 2)
                 { continue; }
-                
+
+            // Add all nums in vec that are not in uniqueNums to uniqueNums
+            findUnique(vec, uniqueNums);
+
             // Start looking after coords
             for (int temp = 0; temp < (int)vec.size() && alone == true; temp++)
             {
@@ -301,8 +308,48 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
             { solutions.push_back( {num} ); }
     }
 
-    // If solutions.size() == 1, then only 1 solution so change grid!
-    if ((int)solutions.size() == 1)
+    // Finalizing uniqueNums vector
+    // Add given numbers in row and col
+    for (int num : grid[row])
+    {
+        std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), num) };
+        if (iter == uniqueNums.end() && num != 0)
+            { uniqueNums.push_back( {num} ); }
+    }
+    for (int row = 0; row < 9; row++)
+    {
+        // Adding to count if num is found
+        if (grid[row][col] != 0)
+        {
+            std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), grid[row][col]) };
+            if (iter == uniqueNums.end())
+                { uniqueNums.push_back( {grid[row][col]} ); }
+        }
+    }
+
+    // Add any given numbers from current box to uniqueNums that aren't already in it
+    for (int tempRow = findPrevThree(row); tempRow < findPrevThree(row) + 3; tempRow++)
+    {
+        for (int tempCol = findPrevThree(col); tempCol < findPrevThree(col) + 3; tempCol++)
+        {
+            if (grid[tempRow][tempCol] != 0)
+            {
+                // If num not in uniqueNums vector, add it
+                std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), grid[tempRow][tempCol]) };
+                if (iter == uniqueNums.end())
+                    { uniqueNums.push_back( {grid[tempRow][tempCol]} ); }
+            }
+        }
+    }
+
+    // FIXME : DELETE LATER
+    std::cout << "uniqueNums = ";
+    for (int num : uniqueNums)
+        { std::cout << num << " "; }
+    std::cout << std::endl;
+
+    // If solutions.size() == 1 and if size of uniqueNums == 8, then solution is actually there
+    if ((int)solutions.size() == 1 && (int)uniqueNums.size() == 8)
     {
         std::cout << "Changing grid[" << row << "][" << col << "] to " << solutions.at(0) << std::endl;
         grid[row][col] = solutions.at(0);
@@ -397,7 +444,7 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
     }
 
     // FIXME : DELTE LATER
-    std::cout << "values before returning:\n";
+    std::cout << "returning row values:\n";
     for (auto &vec : values)
     {
         for (int num : vec)
@@ -493,7 +540,7 @@ std::vector<std::vector<int>> colHypos(std::vector<std::vector<int>> &grid, std:
     }
 
     // FIXME : DELTE LATER
-    std::cout << "values before returning:\n";
+    std::cout << "returning col values:\n";
     for (auto &vec : values)
     {
         for (int num : vec)
@@ -512,24 +559,17 @@ int findPrevThree(int num)
     return num;
 }
 
-// Finds all unique numbers in a 2d vector and returns a 1d vector containing those numbers
-std::vector<int> findUnique(std::vector<std::vector<int>> &orig)
+// Finds all unique numbers in a 1d vector and adds them to newVec
+void findUnique(std::vector<int> &orig, std::vector<int> &newVec)
 {
-    std::vector<int> temp;
-
-    // Loop through 2d vector
-    for (auto &vec : orig)
+    // Loop through vector
+    for (int num : orig)
     {
-        for (int num : vec)
+        // If num not in newVec vector, add it
+        std::vector<int>::iterator iter { std::find(orig.begin(), orig.end(), num) };
+        if (iter == orig.end() && num != 0)
         {
-            // If num not in temp vector, add it
-            std::vector<int>::iterator iter { std::find(vec.begin(), vec.end(), num) };
-            if (iter != vec.end())
-            {
-                temp.push_back( {num} );
-            }
+            newVec.push_back( {num} );
         }
     }
-
-    return temp;
 }

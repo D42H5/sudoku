@@ -16,7 +16,7 @@ bool appliedLogic(std::vector<std::vector<int>> &, std::vector<int> &, int, int)
 bool advancedLogic(std::vector<std::vector<int>> &, std::vector<int> &, int, int);
 std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &, std::vector<int> &, int, int);
 std::vector<std::vector<int>> colHypos(std::vector<std::vector<int>> &, std::vector<int> &, int, int);
-std::vector<int> findUnique(std::vector<std::vector<int>> &);
+void findUnique(std::vector<int> &, std::vector<int> &);
 int findPrevThree(int);
 
 #endif

@@ -138,12 +138,10 @@ int main()
         printGrid(grid); 
         cout << endl << endl; 
 
-        // FIXME : Pause when grid[row][col] == (some num) find logic flaw
-        if (grid[2][2] == 2)
-        {
-            char c;
-            cin >> c;
-        }
+        // FIXME : DELETE LATER... LET'S ME PAUSE FOR DEBUGGING
+        char c;
+        cin >> c;
+
 
     // Repeat while changes are being made and sudoku grid isn't solved yet
     } while (!validSudoku(grid) && madeChange);
