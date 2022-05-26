@@ -59,9 +59,9 @@ int main()
                         // If num is not in current box, look for solutions
                         findSpots(grid, coords, num, rowStart, colStart, 1);
 
-                        // If coords is empty, no spots were found or too many were found
+                        // If coords size is not equal to 1, no spots were found or too many were found
                         // So just continue
-                        if (coords.empty())
+                        if ((int)coords.size() != 1)
                             { continue; }
 
                         // Else solution found! So update sudoku grid
@@ -137,8 +137,8 @@ int main()
         cout << endl << endl; 
 
         // FIXME : DELETE LATER... LET'S ME PAUSE FOR DEBUGGING
-        char c;
-        cin >> c;
+        // char c;
+        // cin >> c;
 
 
     // Repeat while changes are being made and sudoku grid isn't solved yet
