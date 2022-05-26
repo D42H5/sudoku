@@ -212,7 +212,9 @@ bool appliedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, i
         // Change that spot to that number if so
         if (vec.size() == 3)
             {   
-                // std::cout << "Changing grid[" << vec[0] << "][" << vec[1] << "] to " << vec[2] << std::endl;
+                // FIXME: DELETE LATER
+                std::cout << "Found solution for " << vec[2] << " with applied logic\n";
+
                 grid[ vec[0] ][ vec[1] ] = vec[2]; 
                 madeChange = true;
             }
@@ -404,8 +406,8 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
                 // Update count to keep track of current empty cell
                 count++;
 
-                // If num already in box or more than 2 possible solutions with num, skip
-                if (!findSpots(grid, coords, num, findPrevThree(row), findPrevThree(check), 2) || !checkBox(grid, num, findPrevThree(row), findPrevThree(check)) )
+                // If num already in box,skip
+                if (!checkBox(grid, num, findPrevThree(row), findPrevThree(check)) )
                     { continue; }
 
                 // If passes column check, is a possible solution b/c passed row, col and box check
@@ -452,6 +454,15 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
         std::cout << "\n";
     }
 
+    // TO DO:
+    // Essentially refine the removal technique (maybe insert second half into existing code to work with the appear counter variable)
+    // Look through each box, determine if num has only 2 solutions not in same row
+        // If so, find matching num with same conditions and store coordinates for both spots
+    // Loop through nums and to find hypothetical solutions
+    // If findSpots returns false when using 2 (indicates more than 2 possible solutions)
+        // Loop through box (again) and count number of solutions
+        // If solution in coords previously found, skip and don't count towards solutions
+    // If new number of solution cells <= 2, continue with adding section in code
     return values;
 }
 

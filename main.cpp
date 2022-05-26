@@ -87,9 +87,7 @@ int main()
                 {
                     // Apply logic lol
                     if (appliedLogic(grid, toCheck, rowStart, colStart))
-                        {   // FIXME: DELETE LATER
-                            cout << "Found solution with applied logic\n";
-                            madeChange = true; }
+                        { madeChange = true; }
                 }
             }
         }
