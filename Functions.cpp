@@ -287,7 +287,7 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
         // If alone is still true, then solution has been found!
         if (alone)
         {
-            std::cout << "Changing grid[" << row << "][" << col << "] to " << num << std::endl;
+            // std::cout << "Changing grid[" << row << "][" << col << "] to " << num << std::endl;
             grid[row][col] = num;
             madeChange = true;
             break;
@@ -382,13 +382,13 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
     }
 
     // FIXME : DELTE LATER
-    std::cout << "values before returning:\n";
-    for (auto &vec : values)
-    {
-        for (int num : vec)
-            std::cout << num << " ";
-        std::cout << "\n";
-    }
+    // std::cout << "values before returning:\n";
+    // for (auto &vec : values)
+    // {
+    //     for (int num : vec)
+    //         std::cout << num << " ";
+    //     std::cout << "\n";
+    // }
 
     return values;
 }
@@ -478,13 +478,13 @@ std::vector<std::vector<int>> colHypos(std::vector<std::vector<int>> &grid, std:
     }
 
     // FIXME : DELTE LATER
-    std::cout << "values before returning:\n";
-    for (auto &vec : values)
-    {
-        for (int num : vec)
-            std::cout << num << " ";
-        std::cout << "\n";
-    }
+    // std::cout << "values before returning:\n";
+    // for (auto &vec : values)
+    // {
+    //     for (int num : vec)
+    //         std::cout << num << " ";
+    //     std::cout << "\n";
+    // }
 
     return values;
 }

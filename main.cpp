@@ -114,8 +114,8 @@ int main()
                         // If, using super-painfully made logic, a change is made, update madeChange
                         if( advancedLogic(grid, toCheck, row, col) )
                             { madeChange = true; }
-                        char c;
-                        cin >> c;
+                        // char c;
+                        // cin >> c;
                     }
                 }
             }
@@ -137,7 +137,7 @@ int main()
         cout << "Next Sudoku Grid:" << endl;
         printGrid(grid); 
         cout << endl << endl; 
-        sleep(1);
+        // sleep(1);
 
     // Repeat while changes are being made and sudoku grid isn't solved yet
     } while (!validSudoku(grid) && madeChange);
