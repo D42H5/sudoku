@@ -4,7 +4,7 @@
 void inputSquare(std::vector<std::vector<int>> &vec)
 {
     std::ifstream infile;
-    infile.open("sudokuGrid.txt");
+    infile.open("altGrid.txt");
 
     int temp,
         row {0},

@@ -137,8 +137,8 @@ int main()
         cout << endl << endl; 
 
         // FIXME : DELETE LATER... LET'S ME PAUSE FOR DEBUGGING
-        // char c;
-        // cin >> c;
+        char c;
+        cin >> c;
 
 
     // Repeat while changes are being made and sudoku grid isn't solved yet

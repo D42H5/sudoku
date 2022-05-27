@@ -265,7 +265,7 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
 
     // FIXME ?
     // Stop using advancedLogic if there are more than (let's say) 3 possible solutions in a cell
-    if ((int)spot.size() > 2)
+    if ((int)spot.size() > 3)
         {   // FIXME : DELETE LATER
             std::cout << "Returning false... too many solutions\n";
             return false; }
@@ -388,16 +388,16 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     }
 
     // Removing any solution from uniqueNums if it appears twice in current box
-    for (int num : spot)
-    {
-        // If appears any amount of times other than once in box, try to find / remove from uniqueNums
-        if (!findSpots(grid, doubles, num, findPrevThree(row), findPrevThree(col), 1))
-        {
-            std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), num) };
-            if (iter != uniqueNums.end())
-                { uniqueNums.erase(iter); }
-        }
-    }
+    // for (int num : spot)
+    // {
+    //     // If appears any amount of times other than once in box, try to find / remove from uniqueNums
+    //     if (!findSpots(grid, doubles, num, findPrevThree(row), findPrevThree(col), 1))
+    //     {
+    //         std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), num) };
+    //         if (iter != uniqueNums.end())
+    //             { uniqueNums.erase(iter); }
+    //     }
+    // }
 
     // And removing zeros because idk why they are appearing and this is easier lol
     for (int num : uniqueNums)
@@ -409,6 +409,7 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
         }
     }
 
+    std::sort(uniqueNums.begin(), uniqueNums.end());
 
     // FIXME : DELETE LATER
     std::cout << "uniqueNums = ";
@@ -419,7 +420,7 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     // If size of uniqueNums == 8, then solution is actually there
     if ((int)uniqueNums.size() == 8 && !madeChange)
     {
-        for (int num = 1; num <= 9 && !madeChange; num++)
+        for (int num : nums)
         {
             std::cout << "Trying num = " << num << std::endl;
             // Try to find current num in uniqueNums vector
@@ -429,7 +430,8 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
                 { // FIXME : DELETE LATER
                   std::cout << "Changing grid[" << row << "][" << col << "] to " << num << std::endl;
                   grid[row][col] = num; 
-                  madeChange = true; }
+                  madeChange = true; 
+                  break; }
         } 
     }
 
@@ -455,6 +457,10 @@ bool findDoubles(std::vector<std::vector<int>> &grid, std::vector<int> &nums, st
         // FIXME : DELETE LATER
         // std::cout << "\nChecking num " << num << "\n";
 
+        // If already in box, skip to next number
+        if (!checkBox(grid, num, rowStart, colStart))
+            { continue; }
+
         // If only 2 solutions, add coordinates that are new and push back current num
         if (findSpots(grid, tempCoords, num, rowStart, colStart, 2))
         { 
@@ -479,33 +485,72 @@ bool findDoubles(std::vector<std::vector<int>> &grid, std::vector<int> &nums, st
         }
     }
 
-    // FIXME : maybe might have to add possible removal of numbers in coords that have 3 nums that are hypothetical solutions
-    std::vector<int> toRemove;
+    // Vector to hold all unique numbers in doubles vector (that aren't coords)
+    std::vector<int> unique;
     for (auto &vec : doubles)
     {
-        // If vector size == 3, add num to additional vector for removal later
-        if ((int)vec.size() == 3)
-            { toRemove.push_back( {vec[2] } ); }
+        // num = 2 to start at first non-coordinate number
+        for (int num = 2; num < (int)vec.size(); num++)
+        {
+            std::vector<int>::iterator iter { std::find(unique.begin(), unique.end(), vec[num]) };
+            // If iter == unique.end(), num not in unique so add
+            if (iter == unique.end())
+                { unique.push_back( vec[num] ); }
+        }
     }
 
-    // Count used to keep track of current vector in doubles
-    int count {0};
-    for (auto &vec : doubles)
+    // If unique.size() == doubles.size(), there is a chance for a number to be a solution
+    // And would need to be removed
+    if (unique.size() == doubles.size())
     {
-        for (int num : toRemove)
+        // Vector to store numbers that could possibly be removed
+        std::vector<int> possibleRemove;
+        for (auto &vec : doubles)
         {
-            std::vector<int>::iterator iter { std::find(vec.begin() + 2, vec.end(), num) };
-            // If iter returns a positions that is not the end of the vector AND size of vector is 3 (1 solution)
-            // Erase vector
-            if (iter != vec.end() && (int)vec.size() == 3)
-                { doubles.erase(doubles.begin() + count); }
-            
-            // If iter is not the end of vec and vec size is not 3, just remove number
-            else if (iter != vec.end())
-                { vec.erase(iter); }
+            // If vector size == 3, add num to additional vector for possible removal later
+            if ((int)vec.size() == 3)
+                { possibleRemove.push_back( {vec[2] } ); }
         }
 
-        count++;
+        // Count used to keep track of current num in possibleRemove
+        int count {0};
+        for (int num : possibleRemove)
+        {
+            bool foundSolution {false};
+
+            for (auto &vec : doubles)
+            {
+                std::vector<int>::iterator iter { std::find(vec.begin() + 2, vec.end(), num) };
+
+                // If iter is not the end of vec and vec size is greater than 4 (2 coords + 2 non-coords), remove number and change grid position
+                if (iter != vec.end() && (int)vec.size() > 4)
+                    { vec.erase(iter); 
+                      grid[ vec[0] ][ vec[1] ] = *iter; 
+                      foundSolution = true; 
+                      madeChange = true; }
+            }
+
+            // If foundSolution == false, remove number from possibleRemove (to prevent unnecessary vectors from getting removed from doubles)
+            if (!foundSolution)
+                { possibleRemove.erase(possibleRemove.begin() + count); }
+
+            count++;
+        }
+
+        // Remove any vectors from doubles that are of size 3 and contain a non-coord number num
+        // Use count to keep track of current vector in doubles
+        count = 0;
+        for (auto &vec : doubles)
+        {
+            for (int num : possibleRemove)
+            {
+                std::vector<int>::iterator iter { std::find(vec.begin() + 2, vec.end(), num) };
+                if (iter != vec.end() && (int)vec.size() == 3)
+                    { doubles.erase(doubles.begin() + count); }
+            }
+
+            count++;
+        }
     }
 
     // FIXME : DELETE LATER
@@ -513,7 +558,7 @@ bool findDoubles(std::vector<std::vector<int>> &grid, std::vector<int> &nums, st
     // std::cout << std::endl;
     if (doubles.empty())
         std::cout << "Doubles vector empty\n";
-    
+        
     else
     {
         for (auto &vec : doubles)
@@ -548,31 +593,26 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
             { values.push_back( {0} ); }
     }
 
-    // Loop through column and find solutions in empty spaces
+    // Loop through numbers to see which are solutions in each empty cell
     for (int num : nums)
     {
         // Resetting for new numbers
-        appear = 0;
-        count = -1; // I know this looks weird, but it 
-        // let's me just increment count by 1 without extra steps (for index usage)
+        appear = count = 0;
 
-        // Loop through each cell in column
+        // If num in row already, break out of loop row checking loop
+        if (checkRowWithNum(grid, num, row, 1))
+            { break; }
+
+        // Loop through each cell in row
         for (int check = 0; check < 9; check++)
         {
-            // If num in row already, break out of loop row checking loop
-            if (checkRowWithNum(grid, num, row, 1))
-                { break; }
-
-            // IF COORDS MATCH PASSED ROW, CONTINUE AND DEAL WITH IT LATER
-            else if (check == col)
+            // If on passed column skip because trying to check cell passed in
+            if (check == col)
                 { continue; }
 
             // If space is empty, see if num is a solution
             else if (grid[row][check] == 0)
             {
-                // Update count to keep track of current empty cell
-                count++;
-
                 // If num already in box,skip
                 if (!checkBox(grid, num, findPrevThree(row), findPrevThree(check)) )
                     { continue; }
@@ -591,6 +631,9 @@ std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std:
                     // Please don't get rid of appear in the future :)
                     appear++;
                 }
+
+                // Update count to keep track of current empty cell
+                count++;
             }
         }
 
@@ -648,27 +691,22 @@ std::vector<std::vector<int>> colHypos(std::vector<std::vector<int>> &grid, std:
     for (int num : nums)
     {
         // Resetting for new numbers
-        appear = 0;
-        count = -1; // I know this looks weird, but it 
-        // let's me just increment count by 1 without extra steps (for index usage)
+        appear = count = 0;
+
+        // If num in row already, break out of loop row checking loop
+        if (checkColWithNum(grid, num, col, 1))
+            { break; }
 
         // Loop through each cell in column
         for (int check = 0; check < 9; check++)
         {
-            // If num in row already, break out of loop row checking loop
-            if (checkColWithNum(grid, num, col, 1))
-                { break; }
-
-            // IF COORDS MATCH PASSED ROW, CONTINUE AND DEAL WITH IT LATER
-            else if (check == row)
+            // If on passed row skip because trying to check cell passed in
+            if (check == row)
                 { continue; }
 
             // If space is empty, see if num is a solution
             else if (grid[check][col] == 0)
             {
-                // Update count to keep track of current empty cell
-                count++;
-
                 // If num already in box or more than 2 possible solutions with num, skip
                 if (!findSpots(grid, coords, num, findPrevThree(check), findPrevThree(col), 2) || !checkBox(grid, num, findPrevThree(check), findPrevThree(col)) )
                     { continue; }
@@ -687,6 +725,9 @@ std::vector<std::vector<int>> colHypos(std::vector<std::vector<int>> &grid, std:
                     // Please don't get rid of appear in the future :)
                     appear++;
                 }
+
+                // Update count to keep track of current empty cell
+                count++;
             }
         }
 
