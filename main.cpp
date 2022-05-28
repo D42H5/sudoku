@@ -26,6 +26,9 @@ int main()
     // Using a bool to control whether or not logic is applied to find new solutions
     bool madeChange {false};
 
+    // Temp 2d vectors to be able to us appliedLogic in main (and be able to use it in advancedLogic)
+    vector<vector<int>> tempRowVec;
+    vector<vector<int>> tempColVec;
 
     // Inserting predefined sudoku grid in grid vector
     // NOTE: any blank spaces in grid must be filled with zeroes
@@ -86,7 +89,7 @@ int main()
                 for (int colStart = 0; colStart < 9; colStart += 3)
                 {
                     // Apply logic lol
-                    if (appliedLogic(grid, toCheck, rowStart, colStart))
+                    if (appliedLogic(grid, tempRowVec, tempColVec, toCheck, rowStart, colStart))
                         { madeChange = true; }
                 }
             }
@@ -106,15 +109,12 @@ int main()
                 {
                     // BEHOLD
                     // Making sure to only pass in empty cells
-                    if (grid[row][col] == 0)
-                    {
-                        cout << endl << "Passing grid[" << row << "][" << col << "] to advancedLogic\n";
-                        // If, using super-painfully made logic, a change is made, update madeChange
-                        if( advancedLogic(grid, toCheck, row, col) )
-                            {   // FIXME : DELETE LATER
-                                cout << "Found solution for " << grid[row][col] << " with advanced logic\n";    
-                                madeChange = true; }
-                    }
+                    cout << endl << "Passing grid[" << row << "][" << col << "] to advancedLogic\n";
+                    // If, using super-painfully made logic, a change is made, update madeChange
+                    if( advancedLogic(grid, toCheck, row, col) )
+                        {   // FIXME : DELETE LATER
+                            cout << "Found solution for " << grid[row][col] << " with advanced logic\n";    
+                            madeChange = true; }
                 }
             }
         }
@@ -137,6 +137,8 @@ int main()
         cout << endl << endl; 
 
         // FIXME : DELETE LATER... LET'S ME PAUSE FOR DEBUGGING
+        // cout << "Manually checking grid[4][5] with advancedLogic:\n";
+        // advancedLogic(grid, toCheck, 4, 5);
         char c;
         cin >> c;
 

@@ -122,6 +122,12 @@ bool checkBox(std::vector<std::vector<int>> &grid, int num, int rowStart, int co
     return (count == 0) ? true : false;
 }
 
+// Makes code more readable... checks cell with checkBox, checkRowWithNum, and checkColWithNum
+bool cellCheck(std::vector<std::vector<int>> &grid, int num, int row, int col)
+{
+     return (checkBox(grid, num, findPrevThree(row), findPrevThree(col)) && checkRowWithNum(grid, num, row, 0) && checkColWithNum(grid, num, col, 0)) ? true : false;
+}
+
 // Changes coords vector to have row and col in a box that would be the solution for num
 bool findSpots(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>> &coords, int num, int rowStart, int colStart, int n)
 {
@@ -172,16 +178,16 @@ bool findSpots(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>
 
 // Function to find all empty spots in a box, store possible solutions in new vector,
 // and change empty spot to certain num if that num is the only solution in that spot
-bool appliedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, int rowStart, int colStart)
+bool appliedLogic(std::vector<std::vector<int>> &grid, std::vector<std::vector<int>> &rowCoords, std::vector<std::vector<int>> &colCoords, std::vector<int> &nums, int rowStart, int colStart)
 {
     // Make vector to hold numbers at each empty spot
     std::vector<std::vector<int>> spots;
-
-    // Boolean to see if a change is made
-    bool madeChange {false};
     
     // Use count to keep track of what space is currently being checked
     int count {0};
+
+    // Using bool in case more than 1 applied logic solution is found
+    bool madeChange {false};
 
     // Loop through box and at each empty spot, find all nums that fit
     for (int row = rowStart; row < rowStart + 3; row++)
@@ -193,25 +199,50 @@ bool appliedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, i
                 { continue; }
             
             // Else add coords and find all possible solutions for that spot
-            else
-            {
-                // Adding coords to 
-                spots.push_back( {row, col} );
 
-                // Looping through numbers in nums vector
-                for (int num : nums)
+            // Adding coords to 
+            spots.push_back( {row, col} );
+            
+            // Looping through numbers in nums vector
+            for (int num : nums)
+            {
+                // If num is a solution at current space and both row and col coords are empty, add it to current 
+                // space vector in the spots vector
+                if (cellCheck(grid, num, row, col) && rowCoords.empty() && colCoords.empty())
+                    { spots[count].push_back(num); }
+                
+                // Else if cellCheck is true and both row and col coords are NOT empty, run some additional checks 
+                // This is for use with hypothetical numbers passed in as coords vec
+                else if (cellCheck(grid, num, row, col) && !rowCoords.empty() && !colCoords.empty())
                 {
-                    // If num is a solution at current space, add it to current 
-                    // space vector in the spots vector
-                    if (checkBox(grid, num, rowStart, colStart) && checkRowWithNum(grid, num, row, 0) && checkColWithNum(grid, num, col, 0))
+                    bool notSolution {false};
+                    // If vec[1] == num and vec[0] == row, don't add to spot
+                    for (auto &vec : rowCoords)
+                    {
+                        if (vec[1] == num && vec[0] == row)
+                            { notSolution = true; 
+                              break; }
+                    }
+
+                    // If vec[1] == num and vec[0] == col, don't add to spot
+                    for (auto &vec : colCoords)
+                    {
+                        if (vec[1] == num && vec[0] == col)
+                            { notSolution = true; 
+                              break; }
+                    }
+
+                    // If notSolution == false still, then is a possible solution, so add to spots
+                    if (!notSolution)
                         { spots[count].push_back(num); }
                 }
-
-                // Up count for tracking the next empty space
-                ++count;
             }
+            // Up count for tracking the next empty space
+            ++count;
         }
     }
+    
+
     // Check if one of the empty spots only has 1 number that works
     // i.e., empty space vector has size of 3 (2 for coords and 1 for solution)
     for (auto &vec : spots)
@@ -223,11 +254,13 @@ bool appliedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, i
                 std::cout << "Found solution for " << vec[2] << " with applied logic\n";
 
                 grid[ vec[0] ][ vec[1] ] = vec[2]; 
+
+                // Return true because change was made
                 madeChange = true;
             }
     }
     
-    // Return madeChange for checking purposes in main
+    // Making it here means no change, so return false;
     return madeChange;
 }
 
@@ -238,26 +271,27 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     // Vector to hold possible solutions in passed spot
     std::vector<int> spot;
 
-    // Vector to hold final "solution" <- in quotes because of case of more than 1 solution (false solutions)
-    // std::vector<int> solutions;
-
-    // Make vectors to hold solutions for empty cells in same row and column
-    std::vector<std::vector<int>> sameRow = rowHypos(grid, nums, row, col);
-    std::vector<std::vector<int>> sameCol = colHypos(grid, nums, row, col);
-
     // For holding unique numbers from row and col hypotheticals (later)
     std::vector<int> uniqueNums;
 
-    // For holding doubles
+    // For holding unique numbers in doubles vector
+    std::vector<int> uniques;
+
+    // For holding double numbers
     std::vector<std::vector<int>> doubles;
 
-    // Boolean to see if a change is made
-    bool madeChange {false};
+    // For holding double numbers that appear in the same row/col as each other
+    std::vector<std::vector<int>> sameRow;
+    std::vector<std::vector<int>> sameCol;
+
+    // Returning false if current cell is not empty
+    if (grid[row][col] != 0)
+        { return false; }
 
     // Get possible solutions for current coords
     for (int num : nums)
     {
-        if (checkBox(grid, num, findPrevThree(row), findPrevThree(col)) && checkRowWithNum(grid, num, row, 0) && checkColWithNum(grid, num, col, 0))
+        if (cellCheck(grid, num, row, col))
         {
             spot.push_back( {num} );
         }
@@ -275,28 +309,6 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     for (int num : spot)
         std::cout << num << " ";
     std::cout << std::endl;
-
-    // Loop through all hypotheticals in sameRow
-    for (auto &vec : sameRow)
-    {
-        // If more than 2 hypotheticals skip
-        if (vec.size() > 2)
-            { continue; }
-
-        // Add all nums in vec that are not in uniqueNums to uniqueNums
-        findUnique(vec, uniqueNums);
-    }
-
-    // Looping through all hypotheticals in sameCol
-    for (auto &vec : sameCol)
-    {
-        // If more than 2 hypotheticals skip
-        if (vec.size() > 2)
-            { continue; }
-
-        // Add all nums in vec that are not in uniqueNums to uniqueNums
-        findUnique(vec, uniqueNums);
-    }
 
     // Finalizing uniqueNums vector
     // Add given numbers in row and col
@@ -337,79 +349,149 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     // Finding doubles numbers in each box in row/col and adding to unique nums if fall in same row/col
     // Doing row boxes first
     // FIXME
-    std::cout << "Row box doubles:\n";
-    for (int cStart = 0; cStart < 3 && !madeChange; cStart++)
+    // std::cout << "\nRow box doubles:\n";
+    for (int cStart = 0; cStart < 3; cStart++)
     {
-        // Getting new doubles vector to do some checking with... also seeing if any changes were made
-        if (findDoubles(grid, nums, doubles, findPrevThree(row), cStart * 3))
-            { madeChange = true; 
-              break; }
+        // FIXME : DELETE LATER
+        // std::cout << "\nBox: " << cStart << std::endl;
 
-        for (auto &vec : doubles)
+        // Getting new doubles vector to do some checking with... also seeing if any changes were made
+        if (findDoubles(grid, nums, doubles, uniques, findPrevThree(row), cStart * 3))
+            {   // Change was made if in here, so return true
+                return true; }
+
+        // Loop through unique numbers from doubles and see if they are in same row 2x
+        int same {0};
+
+        // FIXME : DELETE LATER
+        std::cout << "Uniques:\n";
+        for (int num : uniques)
+            std::cout << num << " ";
+        std::cout << std::endl;
+
+        for (int uniq : uniques)
         {
-            // If double returns a spot in the same row, fill in any new unique numbers
-            if (vec[0] == row)
+            int count {0};
+
+            for (auto &vec : doubles)
+            {
+                std::vector<int>::iterator iter { std::find(vec.begin(), vec.end(), uniq) };
+                // If find unique number and vec[0] == row, up count
+                if (iter != vec.end() && vec[0] == row)
+                    count++;
+
+                if (iter != vec.end())
+                    sameRow.push_back( {vec[0], uniq} );
+            }
+
+            // If count == 2, try to add to uniqueNums
+            if (count == 2)
+            {
+                std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), uniq) };
+                if (iter != uniqueNums.end())
+                    uniqueNums.push_back( {uniq} );
+            }
+
+            // FIXME : DELETE LATER
+            std::cout << "Before deleting from sameRow:\n";
+            for (auto &vec : sameRow)
             {
                 for (int num : vec)
-                {
-                    std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), num) };
-                    if (iter == uniqueNums.end())
-                        { uniqueNums.push_back( {num} ); }
-                }
+                    std::cout << num << " ";
+                std::cout << std::endl;
+            }
+
+            // Doing stuffs with doubles in same row as each other
+            if ((int)sameRow.size() > 1 && sameRow[same][0] == sameRow[same + 1][0])
+                sameRow.erase(sameRow.begin() + ++same);
+            
+            // If not in same row as each other, delete both
+            else
+            { 
+                sameRow.erase(sameRow.begin() + same + 1);
+                sameRow.erase(sameRow.begin() + same);
             }
         }
     }
 
     // Checking doubles in column boxes
     // FIXME
-    std::cout << "Col box doubles:\n";
-    for (int rStart = 0; rStart < 3 && !madeChange; rStart++)
+    // std::cout << "\n\nCol box doubles:\n";
+    for (int rStart = 0; rStart < 3; rStart++)
     {
-        if (rStart * 3 == findPrevThree(row))
-            { continue; }
-            
-        if (findDoubles(grid, nums, doubles, rStart * 3, findPrevThree(col)))
-            { madeChange = true;
-              break; }
+        // FIXME : DELETE LATER
+        // std::cout << "\nBox: " << rStart << std::endl;
 
-        for (auto &vec : doubles)
+        if (findDoubles(grid, nums, doubles, uniques, rStart * 3, findPrevThree(col)))
+            {   // Change was made if in here, so return true
+                return true; }
+
+        // Loop through unique numbers from doubles and see if they are in same col 2x
+        int same {0};
+        for (int uniq : uniques)
         {
-            // If double returns a spot in the same col, fill in any new unique numbers
-            if (vec[1] == col)
+            int count {0};
+
+            for (auto &vec : doubles)
+            {
+                std::vector<int>::iterator iter { std::find(vec.begin(), vec.end(), uniq) };
+                // If find unique number and vec[1] == col, up count
+                if (iter != vec.end() && vec[1] == col)
+                    count++;
+                
+                if (iter != vec.end())
+                    sameCol.push_back( {vec[1], uniq} );
+            }
+
+            // If count == 2, try to add to uniqueNums
+            if (count == 2)
+            {
+                std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), uniq) };
+                if (iter != uniqueNums.end())
+                    uniqueNums.push_back( {uniq} );
+            }
+
+            // FIXME : DELETE LATER
+            std::cout << "\nBefore deleting from sameCol:\n";
+            for (auto &vec : sameCol)
             {
                 for (int num : vec)
-                {
-                    std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), num) };
-                    if (iter == uniqueNums.end())
-                        { uniqueNums.push_back( {num} ); }
-                }
+                    std::cout << num << " ";
+                std::cout << std::endl;
+            }
+
+            // Doing stuffs with doubles in same col as each other
+            if ((int)sameCol.size() > 1 && sameCol[same][1] == sameCol[same + 1][1])
+                sameCol.erase(sameCol.begin() + ++same);
+            
+            // If not in same row as each other, delete both
+            else
+            { 
+                sameCol.erase(sameCol.begin() + same + 1);
+                sameCol.erase(sameCol.begin() + same);
             }
         }
     }
 
-    // Removing any solution from uniqueNums if it appears twice in current box
-    // for (int num : spot)
-    // {
-    //     // If appears any amount of times other than once in box, try to find / remove from uniqueNums
-    //     if (!findSpots(grid, doubles, num, findPrevThree(row), findPrevThree(col), 1))
-    //     {
-    //         std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), num) };
-    //         if (iter != uniqueNums.end())
-    //             { uniqueNums.erase(iter); }
-    //     }
-    // }
 
-    // And removing zeros because idk why they are appearing and this is easier lol
+    // Sorting uniqueNums
+    // Removing any double numbers and removing zeros because idk why they are appearing and this is easier lol
+    std::sort(uniqueNums.begin(), uniqueNums.end());
+
     for (int num : uniqueNums)
     {
-        if (num == 0)
-        {   
-            std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), num) };
-            uniqueNums.erase(iter); 
-        }
-    }
+        std::vector<int>::iterator iter { std::find(uniqueNums.begin(), uniqueNums.end(), num) };
 
-    std::sort(uniqueNums.begin(), uniqueNums.end());
+        std::vector<int>::iterator iter2 { std::find(iter + 1, uniqueNums.end(), num) };
+        while (iter2 != uniqueNums.end())
+            { uniqueNums.erase(iter2);
+              iter2 = std::find(iter + 1, uniqueNums.end(), num); }
+
+        if (num == 0)
+         { uniqueNums.erase(iter); }
+    }
+    
+    // uniqueNums.erase(std::unique(uniqueNums.begin(), uniqueNums.end()), uniqueNums.end());
 
     // FIXME : DELETE LATER
     std::cout << "uniqueNums = ";
@@ -418,9 +500,9 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
     std::cout << std::endl;
 
     // If size of uniqueNums == 8, then solution is actually there
-    if ((int)uniqueNums.size() == 8 && !madeChange)
+    if ((int)uniqueNums.size() == 8)
     {
-        for (int num : nums)
+        for (int num : spot)
         {
             std::cout << "Trying num = " << num << std::endl;
             // Try to find current num in uniqueNums vector
@@ -429,27 +511,50 @@ bool advancedLogic(std::vector<std::vector<int>> &grid, std::vector<int> &nums, 
             if (iter == uniqueNums.end())
                 { // FIXME : DELETE LATER
                   std::cout << "Changing grid[" << row << "][" << col << "] to " << num << std::endl;
-                  grid[row][col] = num; 
-                  madeChange = true; 
-                  break; }
+                  grid[row][col] = num;
+
+                  // Change was made so return true
+                  return true; }
         } 
     }
 
-    return madeChange;
+    // FIXME : DELETE LATER
+    std::cout << "\nSending sameRow:\n";
+    for (auto &vec : sameRow)
+    {
+        for (int num : vec)
+            std::cout << num << " ";
+        std::cout << std::endl;
+    }
+    std::cout << "\nand sameCol:\n";
+    for (auto &vec : sameCol)
+    {
+        for (int num : vec)
+            std::cout << num << " ";
+        std::cout << std::endl;
+    }
+    std::cout << "To applied logic" << std::endl << std::endl;
+
+    // Recreating appliedLogic to be able to incorporate sameRow and sameCol numbers as a Hail Mary before ending advancedLogic
+    if (appliedLogic(grid, sameRow, sameCol, nums, findPrevThree(row), findPrevThree(col)))
+        { return true; }
+
+    // Making it here means no change, so return false;
+    return false;
 }
 
 // Finds any doubles and does some magic with them
-bool findDoubles(std::vector<std::vector<int>> &grid, std::vector<int> &nums, std::vector<std::vector<int>> &doubles, int rowStart, int colStart)
+bool findDoubles(std::vector<std::vector<int>> &grid, std::vector<int> &nums, std::vector<std::vector<int>> &doubles, std::vector<int> &uniques, int rowStart, int colStart)
 {
     // Vectors for doing stuffs
     std::vector<std::vector<int>> tempCoords;
 
     // Boolean to help keep track of status and if changes are made
-    bool inDoubles,
-        madeChange {false};
+    bool inDoubles;
 
-    // Clearing doubles vector for new coordinates
+    // Clearing doubles and uniques vectors for new data
     doubles.clear();
+    uniques.clear();
 
     // Loop through nums and find any numbers that only have 2 solutions
     for (int num : nums)
@@ -486,48 +591,63 @@ bool findDoubles(std::vector<std::vector<int>> &grid, std::vector<int> &nums, st
     }
 
     // Vector to hold all unique numbers in doubles vector (that aren't coords)
-    std::vector<int> unique;
     for (auto &vec : doubles)
     {
         // num = 2 to start at first non-coordinate number
         for (int num = 2; num < (int)vec.size(); num++)
         {
-            std::vector<int>::iterator iter { std::find(unique.begin(), unique.end(), vec[num]) };
+            std::vector<int>::iterator iter { std::find(uniques.begin(), uniques.end(), vec[num]) };
             // If iter == unique.end(), num not in unique so add
-            if (iter == unique.end())
-                { unique.push_back( vec[num] ); }
+            if (iter == uniques.end())
+                { uniques.push_back( vec[num] ); }
         }
     }
 
+    // To make it look nice for debugging probably :)
+    std::sort(uniques.begin(), uniques.end());
+
     // If unique.size() == doubles.size(), there is a chance for a number to be a solution
     // And would need to be removed
-    if (unique.size() == doubles.size())
+    if (uniques.size() == doubles.size())
     {
-        // Vector to store numbers that could possibly be removed
+        // Vector to store numbers that could possibly be removed (are solutions)
         std::vector<int> possibleRemove;
         for (auto &vec : doubles)
         {
             // If vector size == 3, add num to additional vector for possible removal later
             if ((int)vec.size() == 3)
-                { possibleRemove.push_back( {vec[2] } ); }
+                {   // FIXME : DELETE LATER
+                    // std::cout << "Adding " << vec[2] << " to possibleRemove\n";
+
+                    possibleRemove.push_back( {vec[2]} ); }
         }
+
+        // FIXME
+        // std::cout << "\nAll numbers in possibleRemove: ";
+        // for (int num : possibleRemove)
+        //     std::cout << num << " ";
+        // std::cout << "\n\n";
 
         // Count used to keep track of current num in possibleRemove
         int count {0};
         for (int num : possibleRemove)
         {
+            // FIXME : DELETE LATER
+            // std::cout << "Current num in possibleRemove: " << num << std::endl;
+
             bool foundSolution {false};
 
             for (auto &vec : doubles)
             {
+                // FIXME:
+                // std::cout << "Current vec size == " << vec.size() << std::endl;
+
                 std::vector<int>::iterator iter { std::find(vec.begin() + 2, vec.end(), num) };
 
                 // If iter is not the end of vec and vec size is greater than 4 (2 coords + 2 non-coords), remove number and change grid position
                 if (iter != vec.end() && (int)vec.size() > 4)
                     { vec.erase(iter); 
-                      grid[ vec[0] ][ vec[1] ] = *iter; 
-                      foundSolution = true; 
-                      madeChange = true; }
+                      foundSolution = true; }
             }
 
             // If foundSolution == false, remove number from possibleRemove (to prevent unnecessary vectors from getting removed from doubles)
@@ -546,7 +666,14 @@ bool findDoubles(std::vector<std::vector<int>> &grid, std::vector<int> &nums, st
             {
                 std::vector<int>::iterator iter { std::find(vec.begin() + 2, vec.end(), num) };
                 if (iter != vec.end() && (int)vec.size() == 3)
-                    { doubles.erase(doubles.begin() + count); }
+                { //FIXME : DELETE LATER
+                    std::cout << "Changing grid[" << vec[0] << "][" << vec[1] << "] to " << num << std::endl;
+                    grid[ vec[0] ][ vec[1] ] = *iter; 
+
+                    // Change was made so return true
+                    return true; 
+                    // doubles.erase(doubles.begin() + count); 
+                }
             }
 
             count++;
@@ -556,23 +683,50 @@ bool findDoubles(std::vector<std::vector<int>> &grid, std::vector<int> &nums, st
     // FIXME : DELETE LATER
     // std::cout << "Doubles coords and nums\n";
     // std::cout << std::endl;
-    if (doubles.empty())
-        std::cout << "Doubles vector empty\n";
+    // if (doubles.empty())
+    //     std::cout << "Doubles vector empty\n";
         
-    else
-    {
-        for (auto &vec : doubles)
-        {   
-            std::cout << "Coords: [" << vec[0] << "][" << vec[1] << "] - nums: ";
-            for (int num : vec)
-                std::cout << num << " ";
-            std::cout << std::endl;
-        }
-    }
+    // else
+    // {
+    //     for (auto &vec : doubles)
+    //     {   
+    //         std::cout << "Coords: [" << vec[0] << "][" << vec[1] << "] - nums: ";
+    //         for (int num : vec)
+    //             std::cout << num << " ";
+    //         std::cout << std::endl;
+    //     }
+    // }
 
-    return madeChange;
+    // Makes it here, no changes made, return false
+    return false;
 }
 
+int findPrevThree(int num)
+{
+    while (num % 3 != 0)
+        { --num; }
+
+    return num;
+}
+
+// Finds all unique numbers in a 1d vector and adds them to newVec
+void findUnique(std::vector<int> &orig, std::vector<int> &newVec)
+{
+    // Loop through vector
+    for (int num : orig)
+    {
+        // If num not in newVec vector, add it
+        std::vector<int>::iterator iter { std::find(orig.begin(), orig.end(), num) };
+        if (iter == orig.end() && num != 0)
+        {
+            newVec.push_back( {num} );
+        }
+    }
+}
+
+
+
+// Maybe don't need these anymore ;-;
 std::vector<std::vector<int>> rowHypos(std::vector<std::vector<int>> &grid, std::vector<int> &nums, int row, int col)
 {
     // 2D Vector to return with all the values
@@ -759,27 +913,4 @@ std::vector<std::vector<int>> colHypos(std::vector<std::vector<int>> &grid, std:
     // }
 
     return values;
-}
-
-int findPrevThree(int num)
-{
-    while (num % 3 != 0)
-        { --num; }
-
-    return num;
-}
-
-// Finds all unique numbers in a 1d vector and adds them to newVec
-void findUnique(std::vector<int> &orig, std::vector<int> &newVec)
-{
-    // Loop through vector
-    for (int num : orig)
-    {
-        // If num not in newVec vector, add it
-        std::vector<int>::iterator iter { std::find(orig.begin(), orig.end(), num) };
-        if (iter == orig.end() && num != 0)
-        {
-            newVec.push_back( {num} );
-        }
-    }
 }
