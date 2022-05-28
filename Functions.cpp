@@ -757,14 +757,83 @@ bool findDoubles(std::vector<std::vector<int>> &grid, std::vector<int> &nums, st
         }
     }
 
-    // FIXME : DELTE LATER
-    // std::cout << "values before returning:\n";
-    // for (auto &vec : values)
-    // {
-    //     for (int num : vec)
-    //         std::cout << num << " ";
-    //     std::cout << "\n";
-    // }
+    // To make it look nice for debugging probably :)
+    std::sort(uniques.begin(), uniques.end());
+
+    // If unique.size() == doubles.size(), there is a chance for a number to be a solution
+    // And would need to be removed
+    if (uniques.size() == doubles.size())
+    {
+        // Vector to store numbers that could possibly be removed (are solutions)
+        std::vector<int> possibleRemove;
+        for (auto &vec : doubles)
+        {
+            // If vector size == 3, add num to additional vector for possible removal later
+            if ((int)vec.size() == 3)
+                {   // FIXME : DELETE LATER
+                    // std::cout << "Adding " << vec[2] << " to possibleRemove\n";
+
+                    possibleRemove.push_back( {vec[2]} ); }
+        }
+
+        // FIXME
+        // std::cout << "\nAll numbers in possibleRemove: ";
+        // for (int num : possibleRemove)
+        //     std::cout << num << " ";
+        // std::cout << "\n\n";
+
+        // Count used to keep track of current num in possibleRemove
+        int count {0};
+        for (int num : possibleRemove)
+        {
+            // FIXME : DELETE LATER
+            // std::cout << "Current num in possibleRemove: " << num << std::endl;
+
+            bool foundSolution {false};
+
+            for (auto &vec : doubles)
+            {
+                // FIXME:
+                // std::cout << "Current vec size == " << vec.size() << std::endl;
+
+                std::vector<int>::iterator iter { std::find(vec.begin() + 2, vec.end(), num) };
+
+                // If iter is not the end of vec and vec size is greater than 4 (2 coords + 2 non-coords), remove number and change grid position
+                if (iter != vec.end() && (int)vec.size() > 4)
+                    { vec.erase(iter); 
+                      foundSolution = true; }
+            }
+
+            // If foundSolution == false, remove number from possibleRemove (to prevent unnecessary vectors from getting removed from doubles)
+            if (!foundSolution)
+                { possibleRemove.erase(possibleRemove.begin() + count); }
+
+            count++;
+        }
+
+        // Remove any vectors from doubles that are of size 3 and contain a non-coord number num
+        // Use count to keep track of current vector in doubles
+        count = 0;
+        for (auto &vec : doubles)
+        {
+            for (int num : possibleRemove)
+            {
+                std::vector<int>::iterator iter { std::find(vec.begin() + 2, vec.end(), num) };
+                if (iter != vec.end() && (int)vec.size() == 3)
+                { //FIXME : DELETE LATER
+                    // std::cout << "Changing grid[" << vec[0] << "][" << vec[1] << "] to " << num << std::endl;
+
+                    grid[ vec[0] ][ vec[1] ] = *iter; 
+
+                    // Change was made so return true
+                    return true; 
+                    // doubles.erase(doubles.begin() + count); 
+                }
+            }
+
+            count++;
+        }
+    }
 
     // FIXME : DELETE LATER
     // std::cout << "Doubles coords and nums\n";
