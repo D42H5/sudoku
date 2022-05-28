@@ -26,6 +26,9 @@ int main()
     // Using a bool to control whether or not logic is applied to find new solutions
     bool madeChange {false};
 
+    // Temp 2d vectors to be able to us appliedLogic in main (and be able to use it in advancedLogic)
+    vector<vector<int>> tempRowVec;
+    vector<vector<int>> tempColVec;
 
     // Inserting predefined sudoku grid in grid vector
     // NOTE: any blank spaces in grid must be filled with zeroes
@@ -57,24 +60,22 @@ int main()
                     if (checkBox(grid, num, rowStart, colStart))
                     {
                         // If num is not in current box, look for solutions
-                        findSpots(grid, coords, num, rowStart, colStart, 1);
+                        findSpots(grid, coords, tempRowVec, tempColVec, num, rowStart, colStart, 1);
 
-                        // If coords is empty, no spots were found or too many were found
+                        // If coords size is not equal to 1, no spots were found or too many were found
                         // So just continue
-                        if (coords.empty())
+                        if ((int)coords.size() != 1)
                             { continue; }
-                        
+
                         // Else solution found! So update sudoku grid
                         else
-                            {
-                                grid[ coords[0][0] ][ coords[0][1] ] = num; 
-                                madeChange = true;
-                            }
+                        {
+                            // FIXME : DELETE LATER
+                            // cout << "Found solution for " << num << " with regular logic\n";
+                            grid[ coords[0][0] ][ coords[0][1] ] = num; 
+                            madeChange = true;
+                        }
                     }
-
-                    // If num found in current 3x3 box, continue to next box
-                    else
-                        { continue; }
                 }
             }
         } 
@@ -88,7 +89,7 @@ int main()
                 for (int colStart = 0; colStart < 9; colStart += 3)
                 {
                     // Apply logic lol
-                    if (appliedLogic(grid, toCheck, rowStart, colStart))
+                    if (appliedLogic(grid, tempRowVec, tempColVec, toCheck, rowStart, colStart))
                         { madeChange = true; }
                 }
             }
@@ -99,25 +100,30 @@ int main()
         if (!madeChange)
         {
             // FIXME : remove cout later
-            cout << endl << endl << "Applying ADVANCED MATH AND SCIENCE\n";
+            // cout << endl << endl << "Applying ADVANCED MATH AND SCIENCE\n";
 
             // Loop through every possible cell in the damn grid
+            // bool stop {false};
             for (int row = 0; row < 9 && !madeChange; row++)
             {
                 for (int col = 0; col < 9 && !madeChange; col++)
                 {
                     // BEHOLD
                     // Making sure to only pass in empty cells
-                    if (grid[row][col] == 0)
-                    {
-                        cout << endl << "Passing grid[" << row << "][" << col << "] to advancedLogic\n";
-                        // If, using super-painfully made logic, a change is made, update madeChange
-                        if( advancedLogic(grid, toCheck, row, col) )
-                            { madeChange = true; }
-                        // char c;
-                        // cin >> c;
-                    }
+                    // cout << endl << "Passing grid[" << row << "][" << col << "] to advancedLogic\n";
+                    // If, using super-painfully made logic, a change is made, update madeChange
+                    if( advancedLogic(grid, toCheck, row, col) )
+                        {   // FIXME : DELETE LATER
+                            // cout << "Found solution for " << grid[row][col] << " with advanced logic\n";    
+                            madeChange = true; }
+
+                    // if (row == 5 && col == 2)
+                    //     { cout << "STOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOP\n";
+                    //       stop = true;
+                    //       break; }
                 }
+                // if (stop)
+                //     break;
             }
         }
 
@@ -134,10 +140,16 @@ int main()
             { toCheck.erase( find(toCheck.begin(), toCheck.end(), temp) ); }
 
         // FIXME : remove later, need for printing atm
-        cout << "Next Sudoku Grid:" << endl;
-        printGrid(grid); 
-        cout << endl << endl; 
-        // sleep(1);
+        // cout << "Next Sudoku Grid:" << endl;
+        // printGrid(grid); 
+        // cout << endl << endl; 
+
+        // FIXME : DELETE LATER... LET'S ME PAUSE FOR DEBUGGING
+        // cout << "Manually checking grid[4][5] with advancedLogic:\n";
+        // advancedLogic(grid, toCheck, 4, 5);
+        // char c;
+        // cin >> c;
+
 
     // Repeat while changes are being made and sudoku grid isn't solved yet
     } while (!validSudoku(grid) && madeChange);
