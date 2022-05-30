@@ -27,9 +27,6 @@ Linux / Mac:
     - enjoy :)  
   
 Windows:  
-    - Make a folder and add all the contents to it  
-    - Add your puzzle in sudokuGrid.txt  
-    - Rename main.out to main.exe  
-    - Navigate to the directory in powershell or cmd  
-    - type ./main.exe and hit return  
-    - enjoy :)  
+    - Get a linux subsystem for Windows  
+    - Follow Linux / Mac steps  
+    - Sorry :/  
