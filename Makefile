@@ -1,5 +1,5 @@
 compiler = g++
-flags = -Wall -o
+flags = -Wall -m64 -o
 program = main.out
 files = main.cpp InputFunctions.cpp Functions.cpp
 all: ${program}
